@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#101a35">
+  <meta name="description" content="NEO WORLD — première version mobile">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <title>NEO WORLD</title>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div><div class="eyebrow">TON AVENTURE COMMENCE ICI</div><h1>NEO <span>WORLD</span></h1></div>
+      <div class="wallet">🪙 <strong id="coins">0</strong></div>
+    </header>
+    <section class="status">
+      <span class="live-dot"></span><span id="connection">Mode prototype local</span>
+      <span class="tag">SAISON 01</span>
+    </section>
+    <section class="game-wrap">
+      <canvas id="game" aria-label="Terrain de jeu NEO WORLD"></canvas>
+      <div class="game-label">ÎLE NEO <span>•</span> EXPLORATION</div>
+      <div class="hint" id="hint">Explore l'île et récupère les pièces !</div>
+    </section>
+    <section class="controls">
+      <div class="pad">
+        <button class="dir up" data-dir="up" aria-label="Avancer">▲</button>
+        <button class="dir left" data-dir="left" aria-label="Aller à gauche">◀</button>
+        <button class="dir down" data-dir="down" aria-label="Reculer">▼</button>
+        <button class="dir right" data-dir="right" aria-label="Aller à droite">▶</button>
+      </div>
+      <div class="actions">
+        <button class="action" id="daily">🎁<span>Cadeau du jour</span></button>
+        <button class="action" id="mission">🧭<span>Mission</span></button>
+      </div>
+    </section>
+    <section class="bottom-grid">
+      <article><div class="mini-icon">🧑‍🚀</div><div><b>Mon héros</b><small>Explorateur niveau 1</small></div></article>
+      <article><div class="mini-icon">🌐</div><div><b>Multijoueur</b><small>Prochaine étape</small></div></article>
+    </section>
+    <footer>NEO WORLD · Prototype technique v1 · Les pièces et cadeaux sont fictifs.</footer>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="game.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+    }
+  </script>
+</body>
+</html>
