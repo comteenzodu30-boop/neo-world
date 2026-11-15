@@ -1,38 +1,42 @@
-const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-const coinsEl=document.getElementById("coins"),toastEl=document.getElementById("toast"),hint=document.getElementById("hint");
-let W=720,H=610,player={x:355,y:310},coins=Number(localStorage.getItem("neo_coins")||0),keys={},items=[];
-coinsEl.textContent=coins;
-function resize(){const r=canvas.getBoundingClientRect();const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0)}
-function toast(t){toastEl.textContent=t;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),2100)}
-function makeCoins(){items=[];for(let i=0;i<12;i++)items.push({x:75+(i*137)%570,y:85+(i*91)%440,taken:false})}
-makeCoins();
-function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
-function draw(){
- ctx.clearRect(0,0,W,H);
- // water and island
- ctx.fillStyle="#54c7c1";ctx.fillRect(0,0,W,H);
- for(let i=0;i<90;i++){let x=(i*97)%W,y=(i*61)%H;ellipse(x,y,2+(i%3),1.5,"#ffffff30")}
- ellipse(360,315,306,252,"#287f68");ellipse(360,302,292,245,"#83ce83");
- // paths
- ctx.strokeStyle="#d9bc83";ctx.lineWidth=45;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(110,420);ctx.quadraticCurveTo(330,480,350,300);ctx.quadraticCurveTo(360,150,590,170);ctx.stroke();
- // trees
- for(let i=0;i<18;i++){let x=95+(i*113)%530,y=105+(i*79)%410;if(Math.hypot(x- player.x,y-player.y)>35){ellipse(x,y+12,17,9,"#28704f");ellipse(x,y,17,20,"#237a58");ellipse(x-5,y-6,9,10,"#3d9b68")}}
- // pond
- ellipse(525,385,62,39,"#46b9d1");ellipse(525,385,47,27,"#69d5e4");
- // coins
- items.forEach(c=>{if(!c.taken){ellipse(c.x,c.y+4,10,5,"#98732c");ellipse(c.x,c.y,9,9,"#ffcf45");ctx.fillStyle="#fff0a0";ctx.font="bold 12px sans-serif";ctx.fillText("$",c.x-3.5,c.y+4)}});
- // player shadow and body
- ellipse(player.x,player.y+17,17,8,"#1a634b66");
- ellipse(player.x,player.y+1,13,14,"#ffb27b");
- ellipse(player.x,player.y-12,14,13,"#263b69");
- ellipse(player.x,player.y-16,11,9,"#65d9c3");
- ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(player.x-4,player.y-13,2,0,7);ctx.arc(player.x+4,player.y-13,2,0,7);ctx.fill();
- ctx.fillStyle="#15334b";ctx.font="bold 12px sans-serif";ctx.textAlign="center";ctx.fillText("TOI",player.x,player.y+34);ctx.textAlign="left";
- requestAnimationFrame(draw)
-}
-function update(){let dx=(keys.right?1:0)-(keys.left?1:0),dy=(keys.down?1:0)-(keys.up?1:0);if(dx||dy){let n=Math.hypot(dx,dy);player.x=Math.max(45,Math.min(675,player.x+dx/n*3.2));player.y=Math.max(65,Math.min(550,player.y+dy/n*3.2))}
- items.forEach(c=>{if(!c.taken&&Math.hypot(c.x-player.x,c.y-player.y)<23){c.taken=true;coins+=1;coinsEl.textContent=coins;localStorage.setItem("neo_coins",coins)}});requestAnimationFrame(update)}
+const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
+const $=id=>document.getElementById(id);let W=720,H=625,player={x:360,y:320},keys={},coins=+(localStorage.neoCoins||0),level=+(localStorage.neoLevel||1),inventory=JSON.parse(localStorage.neoBag||"[]"),quests=JSON.parse(localStorage.neoQuests||"[false,false,false]"),day=localStorage.neoDay||"",worldItems=[],toastTimer;
+$("coins").textContent=coins;$("level").textContent=level;$("bagCount").textContent=inventory.length+" objets";$("questCount").textContent=quests.filter(Boolean).length+"/3";
+function save(){localStorage.neoCoins=coins;localStorage.neoLevel=level;localStorage.neoBag=JSON.stringify(inventory);localStorage.neoQuests=JSON.stringify(quests);$("coins").textContent=coins;$("level").textContent=level;$("bagCount").textContent=inventory.length+" objets";$("questCount").textContent=quests.filter(Boolean).length+"/3"}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.remove("show"),1800)}
+function resize(){let r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=r.width*d;canvas.height=r.height*d;ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0)}
+for(let i=0;i<22;i++)worldItems.push({x:70+(i*127)%580,y:75+(i*83)%480,taken:false,type:i%5===0?"crystal":"coin"});
+function oval(x,y,rx,ry,c){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
+function tree(x,y){oval(x,y+12,19,9,"#164e49");oval(x,y,17,20,"#16705d");oval(x-5,y-7,9,10,"#2e9a7b")}
+function draw(){ctx.clearRect(0,0,W,H);let grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,"#55bfc0");grad.addColorStop(1,"#1a778d");ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+for(let i=0;i<100;i++)oval((i*97)%W,(i*61)%H,2+i%3,1.5,"#ffffff25");
+oval(360,322,315,265,"#174e53");oval(360,305,300,253,"#79c97e");
+// sandy winding trail
+ctx.strokeStyle="#d8b87d";ctx.lineWidth=48;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(100,430);ctx.bezierCurveTo(240,500,330,430,345,315);ctx.bezierCurveTo(365,180,460,155,610,180);ctx.stroke();
+// mountain and temple
+ctx.fillStyle="#5b6c91";ctx.beginPath();ctx.moveTo(420,90);ctx.lineTo(495,205);ctx.lineTo(350,205);ctx.fill();ctx.fillStyle="#8b9ab6";ctx.beginPath();ctx.moveTo(420,90);ctx.lineTo(420,205);ctx.lineTo(350,205);ctx.fill();
+ctx.fillStyle="#d7c38d";ctx.fillRect(390,190,65,42);ctx.fillStyle="#745c55";ctx.beginPath();ctx.moveTo(380,193);ctx.lineTo(422,160);ctx.lineTo(465,193);ctx.fill();ctx.fillStyle="#263b54";ctx.fillRect(414,205,17,27);
+for(let i=0;i<26;i++){let x=65+(i*109)%590,y=90+(i*77)%440;if(Math.hypot(x-player.x,y-player.y)>36)tree(x,y)}
+oval(530,390,68,43,"#2b8b9e");oval(530,386,55,31,"#64d0df");
+worldItems.forEach(it=>{if(!it.taken){if(it.type==="crystal"){ctx.save();ctx.translate(it.x,it.y);ctx.rotate(Math.PI/4);ctx.fillStyle="#8c85ff";ctx.fillRect(-7,-7,14,14);ctx.restore();oval(it.x,it.y,4,4,"#e4ddff")}else{oval(it.x,it.y+4,10,5,"#a97928");oval(it.x,it.y,9,9,"#ffd34f");ctx.fillStyle="#fff1ad";ctx.font="bold 12px sans-serif";ctx.fillText("$",it.x-3.5,it.y+4)}}});
+// player
+oval(player.x,player.y+19,18,8,"#123f4b88");oval(player.x,player.y+1,14,15,"#ffb47e");oval(player.x,player.y-12,15,14,"#243a65");oval(player.x,player.y-17,12,9,"#63e5ca");ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(player.x-4,player.y-13,2,0,7);ctx.arc(player.x+4,player.y-13,2,0,7);ctx.fill();ctx.fillStyle="#0c3144";ctx.font="bold 12px sans-serif";ctx.textAlign="center";ctx.fillText("TOI",player.x,player.y+38);ctx.textAlign="left";
+$("coord").textContent="X "+String(Math.round(player.x/7)).padStart(2,"0")+" · Y "+String(Math.round(player.y/7)).padStart(2,"0");requestAnimationFrame(draw)}
+function update(){let dx=(keys.right?1:0)-(keys.left?1:0),dy=(keys.down?1:0)-(keys.up?1:0);if(dx||dy){let n=Math.hypot(dx,dy);player.x=Math.max(38,Math.min(682,player.x+dx/n*3.3));player.y=Math.max(60,Math.min(565,player.y+dy/n*3.3))}
+worldItems.forEach(it=>{if(!it.taken&&Math.hypot(it.x-player.x,it.y-player.y)<23){it.taken=true;let gain=it.type==="crystal"?10:1;coins+=gain;if(!quests[0]&&worldItems.filter(x=>x.taken).length>=5)quests[0]=true;if(it.type==="crystal"){inventory.push("Cristal NEO");toast("+10 pièces · Cristal rare !")}else toast("+1 pièce !");save()}});requestAnimationFrame(update)}
 document.querySelectorAll("[data-dir]").forEach(b=>{let d=b.dataset.dir;b.addEventListener("pointerdown",e=>{e.preventDefault();keys[d]=true;b.setPointerCapture(e.pointerId)});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,()=>keys[d]=false))});
-document.getElementById("daily").addEventListener("click",()=>{let today=new Date().toISOString().slice(0,10),last=localStorage.getItem("neo_daily");if(last===today){toast("Ton cadeau du jour a déjà été récupéré !");return}localStorage.setItem("neo_daily",today);coins+=25;localStorage.setItem("neo_coins",coins);coinsEl.textContent=coins;toast("🎁 +25 pièces virtuelles !")});
-document.getElementById("mission").addEventListener("click",()=>{hint.textContent="Mission : récupère des pièces sur toute l'île";toast("Explore l'île pour trouver les pièces !")});
-resize();window.addEventListener("resize",resize);draw();update();
+function open(title,body){$("modalContent").innerHTML=`<h2>${title}</h2>${body}`;$("modal").classList.remove("hidden")}
+$("close").onclick=()=>$("modal").classList.add("hidden");$("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.add("hidden")};
+$("daily").onclick=()=>{let d=new Date().toLocaleDateString("fr-CA");if(day===d){toast("Cadeau déjà récupéré aujourd'hui !");return}day=d;localStorage.neoDay=d;coins+=50;save();open("🎁 Cadeau quotidien",'<div class="reward">✨ Tu remportes <b>50 pièces NEO</b> ! Reviens demain pour ton prochain cadeau.</div><button class="primary" id="ok">Génial !</button>');$("ok").onclick=()=>$("modal").classList.add("hidden")};
+$("quest").onclick=()=>open("📜 Missions NEO",`<p>Accomplis des objectifs pour progresser.</p><div class="task">${quests[0]?"✅":"🔹"} Ramasser 5 objets sur l'île — ${quests[0]?"Terminé":"En cours"}</div><div class="task">${quests[1]?"✅":"🔹"} Gagner une course — ${quests[1]?"Terminé":"À faire"}</div><div class="task">${quests[2]?"✅":"🔹"} Résoudre l'énigme du temple — ${quests[2]?"Terminé":"À faire"}</div>`);
+$("bag").onclick=()=>open("🎒 Sac à dos",inventory.length?inventory.map(x=>`<div class="item">💎 ${x}</div>`).join(""):'<p>Ton sac est vide. Explore l’île pour trouver des cristaux rares !</p>');
+$("race").onclick=()=>open("🏎️ NEO RACING",'<p>Prêt pour un sprint ? Appuie vite sur le bouton pour accélérer et battre ton record.</p><div class="reward">🏁 Objectif : atteindre 100 points avant la fin du chrono.</div><h2 id="score">0 / 100</h2><button class="primary" id="boost">ACCÉLÉRER ! ⚡</button><p id="raceMsg">Chaque pression te fait gagner 10 points.</p>');
+document.addEventListener("click",e=>{if(e.target.id==="boost"){let s=+(document.getElementById("score").textContent.split(" ")[0])+10;document.getElementById("score").textContent=Math.min(100,s)+" / 100";if(s>=100){document.getElementById("raceMsg").textContent="Victoire ! +30 pièces NEO";if(!quests[1])quests[1]=true;coins+=30;save();e.target.disabled=true}}});
+$("puzzle").onclick=()=>open("🧩 TEMPLE DES ÉNIGMES",'<p>Je grandis quand on me partage, mais je disparais quand on me garde pour soi. Qui suis-je ?</p><button class="secondary" id="ans1">La richesse</button><button class="secondary" id="ans2">Le savoir</button><button class="secondary" id="ans3">Un secret</button><p id="answer"></p>');
+document.addEventListener("click",e=>{if(["ans1","ans2","ans3"].includes(e.target.id)){let ok=e.target.id==="ans2";$("answer").textContent=ok?"Bravo ! Tu as trouvé. +20 pièces !":"Pas tout à fait. Réessaie !";if(ok&&!quests[2]){quests[2]=true;coins+=20;save()}}});
+$("shop").onclick=()=>open("✨ NEO STORE",'<p>Objets cosmétiques de démonstration. Aucun achat réel.</p><div class="item">🕶️ Lunettes futuristes <b>40 🪙</b><button data-buy="Lunettes futuristes" data-price="40">Obtenir</button></div><div class="item">🛹 Hoverboard bleu <b>80 🪙</b><button data-buy="Hoverboard bleu" data-price="80">Obtenir</button></div><div class="item">👑 Couronne NEO <b>120 🪙</b><button data-buy="Couronne NEO" data-price="120">Obtenir</button></div>');
+document.addEventListener("click",e=>{if(e.target.dataset.buy){let p=+e.target.dataset.price,n=e.target.dataset.buy;if(inventory.includes(n)){toast("Tu possèdes déjà cet objet.");return}if(coins<p){toast("Pas assez de pièces !");return}coins-=p;inventory.push(n);save();toast(n+" ajouté au sac !");e.target.textContent="Possédé";e.target.disabled=true}});
+$("navHero").onclick=()=>open("🧑‍🚀 TON HÉROS",`<div class="statgrid"><div class="stat"><b>⭐ ${level}</b><small>NIVEAU</small></div><div class="stat"><b>🪙 ${coins}</b><small>PIÈCES</small></div><div class="stat"><b>💎 ${inventory.length}</b><small>OBJETS</small></div><div class="stat"><b>🏆 ${quests.filter(Boolean).length}/3</b><small>MISSIONS</small></div></div>`);
+$("navMap").onclick=()=>$("objective").textContent="CARTE : ÎLE NEO · TEMPLE · LAGON · FORÊT";
+$("navSocial").onclick=()=>open("🌐 UNIVERS EN LIGNE",'<p>Le mode multijoueur arrive dans une prochaine version.</p><div class="reward">🔒 Serveur en préparation — aucun autre joueur connecté pour le moment.</div>');
+$("navWorld").onclick=()=>{$("objective").textContent="OBJECTIF : explore l'île et trouve les cristaux";$("modal").classList.add("hidden")};
+resize();addEventListener("resize",resize);draw();update();

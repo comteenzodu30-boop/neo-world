@@ -1,53 +1,43 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="theme-color" content="#101a35">
-  <meta name="description" content="NEO WORLD — première version mobile">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css">
-  <title>NEO WORLD</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080d20"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css">
+<title>NEO WORLD — Beyond</title>
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div><div class="eyebrow">TON AVENTURE COMMENCE ICI</div><h1>NEO <span>WORLD</span></h1></div>
-      <div class="wallet">🪙 <strong id="coins">0</strong></div>
-    </header>
-    <section class="status">
-      <span class="live-dot"></span><span id="connection">Mode prototype local</span>
-      <span class="tag">SAISON 01</span>
-    </section>
-    <section class="game-wrap">
-      <canvas id="game" aria-label="Terrain de jeu NEO WORLD"></canvas>
-      <div class="game-label">ÎLE NEO <span>•</span> EXPLORATION</div>
-      <div class="hint" id="hint">Explore l'île et récupère les pièces !</div>
-    </section>
-    <section class="controls">
-      <div class="pad">
-        <button class="dir up" data-dir="up" aria-label="Avancer">▲</button>
-        <button class="dir left" data-dir="left" aria-label="Aller à gauche">◀</button>
-        <button class="dir down" data-dir="down" aria-label="Reculer">▼</button>
-        <button class="dir right" data-dir="right" aria-label="Aller à droite">▶</button>
-      </div>
-      <div class="actions">
-        <button class="action" id="daily">🎁<span>Cadeau du jour</span></button>
-        <button class="action" id="mission">🧭<span>Mission</span></button>
-      </div>
-    </section>
-    <section class="bottom-grid">
-      <article><div class="mini-icon">🧑‍🚀</div><div><b>Mon héros</b><small>Explorateur niveau 1</small></div></article>
-      <article><div class="mini-icon">🌐</div><div><b>Multijoueur</b><small>Prochaine étape</small></div></article>
-    </section>
-    <footer>NEO WORLD · Prototype technique v1 · Les pièces et cadeaux sont fictifs.</footer>
-  </main>
-  <div class="toast" id="toast" role="status"></div>
-  <script src="game.js"></script>
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-    }
-  </script>
-</body>
-</html>
+<div class="app">
+<header class="top">
+ <div class="brand"><div class="logo">N</div><div><small>UNIVERS INFINI</small><h1>NEO <span>WORLD</span></h1></div></div>
+ <div class="wallet">🪙 <b id="coins">0</b></div>
+</header>
+<div class="season"><span class="pulse"></span> SAISON 01 · L'ÉVEIL <span class="right">NIVEAU <b id="level">1</b></span></div>
+<section class="hero">
+ <canvas id="world" aria-label="Monde NEO WORLD"></canvas>
+ <div class="worldtop"><b>🌴 NEO ISLAND</b><span id="weather">☀️ JOUR</span></div>
+ <div class="worldbottom"><span id="objective">OBJECTIF : explore l'île et trouve les cristaux</span><span class="coord" id="coord">X 00 · Y 00</span></div>
+ <div class="toast" id="toast"></div>
+</section>
+<section class="move-area">
+ <div class="dpad">
+  <button data-dir="up" class="up">▲</button><button data-dir="left" class="left">◀</button><button data-dir="down" class="down">▼</button><button data-dir="right" class="right">▶</button>
+ </div>
+ <div class="quick">
+  <button class="quickbtn" id="quest"><i>📜</i><b>MISSIONS</b><small id="questCount">0/3</small></button>
+  <button class="quickbtn" id="daily"><i>🎁</i><b>CADEAU</b><small>Quotidien</small></button>
+  <button class="quickbtn" id="bag"><i>🎒</i><b>SAC</b><small id="bagCount">0 objets</small></button>
+ </div>
+</section>
+<section class="modes">
+ <button class="mode-card" id="race"><span class="mode-art race-art">🏎️</span><span><b>NEO RACING</b><small>Défi chronométré</small></span><span class="arrow">›</span></button>
+ <button class="mode-card" id="puzzle"><span class="mode-art puzzle-art">🧩</span><span><b>NEO PUZZLE</b><small>Le temple des énigmes</small></span><span class="arrow">›</span></button>
+ <button class="mode-card" id="shop"><span class="mode-art shop-art">✨</span><span><b>NEO STORE</b><small>Style & accessoires</small></span><span class="arrow">›</span></button>
+</section>
+<nav class="bottomnav"><button class="active" id="navWorld">🌍<small>MONDE</small></button><button id="navHero">🧑‍🚀<small>HÉROS</small></button><button id="navMap">🗺️<small>CARTE</small></button><button id="navSocial">🌐<small>EN LIGNE</small></button></nav>
+<footer>NEO WORLD · BUILD 0.2 · PROTOTYPE LOCAL</footer>
+</div>
+<div class="modal hidden" id="modal"><div class="panel"><button class="close" id="close">✕</button><div id="modalContent"></div></div></div>
+<script src="game.js"></script>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
+</body></html>

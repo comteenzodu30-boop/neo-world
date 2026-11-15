@@ -1,10 +1,1 @@
-{
-  "name": "NEO WORLD",
-  "short_name": "NEO WORLD",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0b1227",
-  "theme_color": "#101a35",
-  "description": "Première version mobile de NEO WORLD",
-  "icons": []
-}
+{"name": "NEO WORLD Beyond", "short_name": "NEO WORLD", "start_url": "./index.html", "display": "standalone", "background_color": "#080d20", "theme_color": "#080d20", "description": "Prototype mobile NEO WORLD"}

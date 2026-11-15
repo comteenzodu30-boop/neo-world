@@ -1,4 +1,1 @@
-const CACHE="neo-world-v1";
-const FILES=["./","./index.html","./style.css","./game.js","./manifest.webmanifest"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
-self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+const C="neo-world-v2";const F=["./","./index.html","./style.css","./game.js","./manifest.webmanifest"];self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F))));self.addEventListener("fetch",e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
